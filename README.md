@@ -1,83 +1,85 @@
-# 🧠 DigitGAN-MNIST
+# DigitGAN: Generating and Classifying MNIST Digits with GANs
 
-A PyTorch-based Generative Adversarial Network (GAN) project for generating handwritten MNIST digits, evaluating them with a classifier, and enabling controlled digit generation using a latent code predictor.
+## Overview
 
----
+This project implements a Generative Adversarial Network (GAN) to generate handwritten digit images similar to the MNIST dataset. It also includes a classifier model to evaluate real and generated digits, and performs analysis to understand classifier behavior on real (S0) and generated (S1) test sets.
 
-## 📌 Overview
+## Files
 
-This project explores how GANs can be used to synthesize handwritten digits similar to those in the MNIST dataset. It also uses a classifier to evaluate the quality of generated digits and introduces a method to generate **specific digits on demand**.
+* `GAN_for_MNIST.ipynb`: Complete training and evaluation code for the Generator, Discriminator, and Classifier.
+* `Fake_Digits/`: Folder structure where 100 GAN-generated digits were saved, organized by label.
+* `fakeimage_grid.png`: A 10x10 grid visualization of selected GAN-generated digits.
+* `c.pkl`: Saved PyTorch classifier model.
+* `G.pkl`, `D.pkl`: Saved Generator and Discriminator model weights.
 
----
+## GAN Model
 
-## 🔧 GAN Architecture
+* **Architecture:** A standard GAN with a Generator and Discriminator trained on MNIST (28x28 grayscale digits).
+* **Generator Input:** 100-dimensional random latent vector `z`.
+* **Generator Output:** 28x28 grayscale digit image.
+* **Loss Function:** Binary Cross-Entropy for both Generator and Discriminator.
+* **Training Data:** MNIST training set (60,000 images).
+* **Epochs:** 50 epochs.
+* **Improvements:**
 
-We trained a standard GAN with:
-- A **Generator** that takes a 100-dimensional random latent vector `z` and outputs a 28×28 grayscale digit image.
-- A **Discriminator** that distinguishes between real MNIST digits and generated images.
+  * Used LeakyReLU activations.
+  * Batch normalization in Generator.
+  * Normalized image pixels to \[-1, 1].
+  * Regular monitoring of generated image quality.
 
-<p align="center">
-  <img src="Images/GAN.png" alt="GAN architecture" width="600"/>
-</p>
+## Classifier Model
 
----
+* **Architecture:** Fully connected neural network.
+* **Training Data:** MNIST training set (60,000 images).
+* **Testing Data:** MNIST test set (10,000 images).
+* **Epochs:** 5
+* **Final Training Accuracy:** 99.44%
+* **Testing Accuracy:** 98.98%
 
-## 🖼️ Sample Digits Generated
+## Results
 
-Here are some digits produced by the Generator after training:
+### 10x10 Grid of Generated Digits
 
-<p align="center">
-  <img src="Images/Sampledigits_generated_by_generator.png" alt="Sample digits" width="500"/>
-</p>
+* ![Generated Digits](fakeimage_grid.png)
 
----
+### Classifier Accuracy
 
-## 🧪 Evaluating Generated Digits (S1)
+| Epoch | Loss   | Accuracy |
+| ----- | ------ | -------- |
+| 1     | 142.94 | 95.36%   |
+| 2     | 40.91  | 98.67%   |
+| 3     | 28.10  | 99.04%   |
+| 4     | 21.00  | 99.27%   |
+| 5     | 15.64  | 99.44%   |
 
-To measure the realism of generated digits, we:
-- Created a test set of 100 fake digits (**S1**) from the Generator.
-- Created a test set of 100 real MNIST digits (**S0**).
-- Used a trained Classifier to evaluate both.
+### Classification Performance
 
-<p align="center">
-  <img src="Images/S1_using_generator.png" alt="S0 and S1 evaluation" width="600"/>
-</p>
+* **S0 (Real Test Set):** 0.00% error
+* **S1 (Generated Set):** 18.00% error
 
----
+## Observations
 
-## 🎯 Classifier Model
+* Classifier performs very well on real MNIST data (0.00% error on S0).
+* Error on generated images (S1) is 18.00%, suggesting some digits lack visual clarity.
+* Indicates challenge in GAN learning diverse and high-quality digit patterns.
 
-The classifier was trained on the official MNIST dataset and achieved high accuracy. It was used to evaluate both real and fake images, and to filter good examples for training the Latent Code Predictor.
+## Final Question Response
 
-<p align="center">
-  <img src="Images/Classifier.png" alt="Classifier model" width="500"/>
-</p>
+> **“How would you generate specific digits using your existing Generator?”**
 
----
+To generate specific digits (e.g., image of 5), we propose training a **Latent Code Predictor** (LCP):
 
-## 🔁 Controlled Digit Generation
+1. **Input:** One-hot encoded digit label.
+2. **Output:** 100-dimensional latent vector `z`.
+3. **Generator G:** Frozen; receives z from LCP and generates an image.
 
-A **Latent Code Predictor** network is introduced to generate a specific digit based on its label. Instead of sampling `z` randomly, can train a network to map a digit label (like “3”) to the correct `z` vector that, when passed to the Generator, produces an image of “3”.
+**Training Process (Suggested):**
 
-<p align="center">
-  <img src="Images/Inference.png" alt="Inference" width="500"/>
-</p>
+* Generate many `z` samples.
+* Pass through Generator → fake images.
+* Classify images using the trained Classifier.
+* Keep (label, z) pairs where the prediction is correct.
+* Train the LCP to map label → z using MSE loss.
 
----
-
-## 📂 Files
-
-- `GAN_for_MNIST.ipynb` — complete Colab notebook
-- `/Images/` — architecture diagrams, output samples, and evaluation visuals
-- `fakeimage_grid.png` — 10×10 grid of selected clean generated digits
-- `C.pkl`, `D.pkl`, `G.pkl` — saved models (optional to include)
-
----
-
-## ✅ Results
-
-- **Classifier Accuracy (Test set)**: 98.98%
-- **S0 classification error**: 0.00%
-- **S1 classification error**: 18.00%
-
+**Note:** This is a proposed extension and is not implemented in the code.
 
