@@ -12,6 +12,15 @@ This project implements a Generative Adversarial Network (GAN) to generate handw
 * `c.pkl`: Saved PyTorch classifier model.
 * `G.pkl`, `D.pkl`: Saved Generator and Discriminator model weights.
 
+## Dataset Details
+
+* **Dataset Used:** MNIST digit dataset (from Kaggle Digit Recognizer competition)
+* **Image Size:** 28x28 pixels, grayscale
+* **Pixel Values:** 0 (white) to 255 (black), normalized to \[-1, 1] for training
+* **Training Samples:** 42,000 digit-labeled images
+* **Test Samples:** 28,000 images (no labels used)
+* For classifier validation: Official MNIST test set of 10,000 labeled samples
+
 ## GAN Model
 
 * **Architecture:** A standard GAN with a Generator and Discriminator trained on MNIST (28x28 grayscale digits).
